@@ -1,15 +1,14 @@
 import React, { Component } from 'react';
 import './App.css';
 
-const sqrObj = {
-  'selected': false, 
-  'guessed': false
+const sqrObj = () => {
+  return {'selected': false, 'guessed': false}
 }
 
 const genBoard = () => {
   const boardArr = []
   for (let i=0;i<12;i++){
-    boardArr.push(sqrObj)
+    boardArr.push(sqrObj())
   }
   return boardArr
 }
@@ -26,7 +25,6 @@ class Game extends Component {
     this.renderSquare = this.renderSquare.bind(this);
     this.phaseHandler = this.phaseHandler.bind(this);
     this.selectPhase = this.selectPhase.bind(this);
-
   }
 
   phaseHandler () {
@@ -74,23 +72,44 @@ class Game extends Component {
     this.setState({board:newBoard})
   }
 
-  squareHandler(cellId) {
-    let arr = this.state.board.map(item => {
-      if (cellId === item.cellId) {
-        return { 'cellId': item.cellId, 'disabled': true };
+  squareHandler(event) {
+    let newBoard = this.state.board.map(function (item, x) {
+      if (event.target.id == x) {
+        return {'selected': item.selected, 'guessed': true };
       }
-      else { return item; }
-    });
-
-    this.setState({ board: arr });
-
+      else { 
+        return item; 
+      }
+    })
+    this.setState({ board: newBoard })
   }
 
-  renderSquare(i, selected, guessed) {
-    let sqrStyle={backgroundColor:'grey'};
-    selected ? sqrStyle = { backgroundColor: 'blue' } : sqrStyle = { backgroundColor: 'grey' };
+  renderSquare(i, selected, guessed, phase) {
+
+    const styles = { 
+      start: {
+        backgroundColor: 'grey'
+      },
+      selected: {
+        backgroundColor: 'blue'
+      },
+      guessed: {
+        backgroundColor: 'green'
+      },
+      guessedCorrect: {
+        backgroundColor: 'green'
+      }
+    }
+
+    let sqrStyle = {}
+    // console.log(phase, selected)
+    if (phase === 'start' || 'select') {sqrStyle = styles.start }
+    if (phase === 'select') { sqrStyle = styles.start }
+    if (phase === 'display' && selected) { sqrStyle = styles.selected }
+    if (phase === 'guess' && guessed) { sqrStyle = styles.guessed }
+
     return (
-      <button className="square" id={i} style={sqrStyle} onClick={() => {this.squareHandler(this.id); }}></button>
+      <button className="square" id={i} style={sqrStyle} onClick={ this.squareHandler }></button>
     )
   }
 
@@ -102,22 +121,22 @@ class Game extends Component {
         <h1 id="title">Memory Game</h1>
           <div id="game-board">
             <div className="board-row">
-              {this.renderSquare(0, this.state.board[0].selected, this.state.board[0].guessed)}
-              {this.renderSquare(1, this.state.board[1].selected, this.state.board[1].guessed)}
-              {this.renderSquare(2, this.state.board[2].selected, this.state.board[2].guessed)}
-              {this.renderSquare(3, this.state.board[3].selected, this.state.board[3].guessed)} 
+              {this.renderSquare(0, this.state.board[0].selected, this.state.board[0].guessed, this.state.phase)}
+            {this.renderSquare(1, this.state.board[1].selected, this.state.board[1].guessed, this.state.phase)}
+            {this.renderSquare(2, this.state.board[2].selected, this.state.board[2].guessed, this.state.phase)}
+            {this.renderSquare(3, this.state.board[3].selected, this.state.board[3].guessed, this.state.phase)} 
             </div>
             <div className="board-row">
-              {this.renderSquare(4, this.state.board[4].selected, this.state.board[4].guessed)}
-              {this.renderSquare(5, this.state.board[5].selected, this.state.board[5].guessed)}
-              {this.renderSquare(6, this.state.board[6].selected, this.state.board[6].guessed)}
-              {this.renderSquare(7, this.state.board[7].selected, this.state.board[7].guessed)}
+            {this.renderSquare(4, this.state.board[4].selected, this.state.board[4].guessed, this.state.phase)}
+            {this.renderSquare(5, this.state.board[5].selected, this.state.board[5].guessed, this.state.phase)}
+            {this.renderSquare(6, this.state.board[6].selected, this.state.board[6].guessed, this.state.phase)}
+            {this.renderSquare(7, this.state.board[7].selected, this.state.board[7].guessed, this.state.phase)}
             </div>
             <div className="board-row">
-              {this.renderSquare(8, this.state.board[8].selected, this.state.board[8].guessed)}
-              {this.renderSquare(9, this.state.board[9].selected, this.state.board[9].guessed)}
-              {this.renderSquare(10, this.state.board[10].selected, this.state.board[10].guessed)}
-              {this.renderSquare(11, this.state.board[11].selected, this.state.board[11].guessed)}
+            {this.renderSquare(8, this.state.board[8].selected, this.state.board[8].guessed, this.state.phase)}
+            {this.renderSquare(9, this.state.board[9].selected, this.state.board[9].guessed, this.state.phase)}
+            {this.renderSquare(10, this.state.board[10].selected, this.state.board[10].guessed, this.state.phase)}
+            {this.renderSquare(11, this.state.board[11].selected, this.state.board[11].guessed, this.state.phase)}
             </div>
           </div>
           <div id="game-phase">
